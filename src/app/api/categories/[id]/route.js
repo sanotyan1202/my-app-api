@@ -2,6 +2,18 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// CORSヘッダーを含んだレスポンスを生成する共通関数
+function createResponse(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status: status,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
 export async function GET(request, { params }) {
   const { id } = params;
 
@@ -11,8 +23,12 @@ export async function GET(request, { params }) {
   });
 
   if (!category) {
-    return new Response(JSON.stringify({ message: 'Category not found' }), { status: 404 });
+    return createResponse({ message: 'Category not found' }, 404);
   }
 
-  return new Response(JSON.stringify(category), { status: 200 });
+  return createResponse(category);
+}
+
+export async function OPTIONS() {
+  return createResponse(null, 204);
 }

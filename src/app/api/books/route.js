@@ -2,11 +2,20 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET(request) {
-  const books = await prisma.book.findMany({
-    include: { category: true },
+function createResponse(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status: status,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
   });
-  return new Response(JSON.stringify(books), { status: 200 });
+}
+
+export async function GET(request) {
+  const books = await prisma.book.findMany({ include: { category: true } });
+  return createResponse(books);
 }
 
 export async function POST(request) {
@@ -14,7 +23,7 @@ export async function POST(request) {
   const newBook = await prisma.book.create({
     data: { title: data.title, categoryId: data.categoryId },
   });
-  return new Response(JSON.stringify(newBook), { status: 201 });
+  return createResponse(newBook, 201);
 }
 
 export async function PUT(request) {
@@ -23,13 +32,15 @@ export async function PUT(request) {
     where: { id: data.id },
     data: { title: data.title, categoryId: data.categoryId },
   });
-  return new Response(JSON.stringify(updatedBook), { status: 200 });
+  return createResponse(updatedBook);
 }
 
 export async function DELETE(request) {
   const data = await request.json();
-  await prisma.book.delete({
-    where: { id: data.id },
-  });
-  return new Response(JSON.stringify({ message: 'Book deleted' }), { status: 200 });
+  await prisma.book.delete({ where: { id: data.id } });
+  return createResponse({ message: 'Book deleted' });
+}
+
+export async function OPTIONS() {
+  return createResponse(null, 204);
 }
