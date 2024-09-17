@@ -29,23 +29,13 @@ export async function POST(request) {
   return createResponse(newCategory, 201);
 }
 
-export async function PUT(request) {
-  const data = await request.json();
-  const updatedCategory = await prisma.category.update({
-    where: { id: data.id },
-    data: { name: data.name },
-  });
-  return createResponse(updatedCategory);
-}
-
-export async function DELETE(request) {
-  const data = await request.json();
-  await prisma.category.delete({
-    where: { id: data.id },
-  });
-  return createResponse({ message: 'Category deleted' });
-}
-
 export async function OPTIONS() {
-  return createResponse(null, 204);
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }

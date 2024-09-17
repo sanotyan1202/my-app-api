@@ -29,6 +29,33 @@ export async function GET(request, { params }) {
   return createResponse(category);
 }
 
+export async function PUT(request, { params }) {
+  const { id } = params;
+
+  const updatedCategory = await prisma.category.update({
+    where: { id: Number(id) },
+    data: { name: data.name },
+  });
+  return createResponse(updatedCategory);
+}
+
+export async function DELETE(request, { params }) {
+  const { id } = params;
+
+  await prisma.category.delete({
+    where: { id: Number(id) },
+  });
+  return createResponse({ message: 'Category deleted' });
+}
+
+
 export async function OPTIONS() {
-  return createResponse(null, 204);
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }

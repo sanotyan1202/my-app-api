@@ -29,6 +29,32 @@ export async function GET(request, { params }) {
   return createResponse(book);
 }
 
+export async function PUT(request, { params }) {
+  const { id } = params;
+
+  const data = await request.json();
+  const updatedBook = await prisma.book.update({
+    where: { id: Number(id) },
+    data: { title: data.title, categoryId: data.categoryId },
+  });
+  return createResponse(updatedBook);
+}
+
+export async function DELETE(request, { params }) {
+  const { id } = params;
+
+  await prisma.book.delete({ where: { id: Number(id) } });
+  return createResponse({ message: 'Book deleted' });
+}
+
+
 export async function OPTIONS() {
-  return createResponse(null, 204);
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }
